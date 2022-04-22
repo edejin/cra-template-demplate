@@ -1,0 +1,31 @@
+{
+  "name": "demplate",
+  "version": "0.0.1",
+  "keywords": [
+    "react",
+    "create-react-app",
+    "template",
+    "typescript",
+    "zustand",
+    "antd",
+    "styled-components",
+    "rtl-support"
+  ],
+  "author": {
+    "email": "efim@dezh.in",
+    "name": "Efim Dezhin"
+  },
+  "description": "Custom template for Create React App.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edejin/demplate"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "files": [
+    "template",
+    "template.json"
+  ]
+}
