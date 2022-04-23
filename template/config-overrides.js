@@ -1,6 +1,9 @@
 const path = require('path');
+const {addBabelPlugin} = require('customize-cra');
 
-module.exports = function override(config) {
+module.exports = function override(config, env) {
+  let isDev = env === 'development';
+
   config.resolve = {
     ...config.resolve,
     alias: {
@@ -20,6 +23,16 @@ module.exports = function override(config) {
     "stream": false, // require.resolve("stream-browserify"),
     "util": false, // require.resolve("util/"),
     "crypto": false, // require.resolve("crypto-browserify")
+  }
+
+  if (isDev) {
+    addBabelPlugin([
+      'babel-plugin-styled-components',
+      {
+        displayName: true,
+        fileName: true
+      },
+    ])(config);
   }
 
   return config;
