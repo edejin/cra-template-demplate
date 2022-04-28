@@ -1,3 +1,7 @@
 {
-  "test": "اختبار"
+  "Home": "مسكن",
+  "List": "قائمة",
+  "App": "برنامج",
+  "subnav {value}": "ملاحة فرعية {value}",
+  "option {value}": "اختيار {value}"
 }

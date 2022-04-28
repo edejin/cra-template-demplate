@@ -1,23 +1,25 @@
 import React from 'react';
 import {Locale, useLocaleStore} from '@/store/locale';
-import {T} from './Translate';
 import styled from 'styled-components';
+import {TranslationOutlined} from '@ant-design/icons';
 
 const Wrapper = styled.div`
-  border-right: 3px solid red;
-  /*rtl:ignore*/
-  padding-left: 10px;
+  float: right;
+  /* 'rtl:ignore' cannot be first line :)  */
+  /* rtl:ignore */
+  border-right: 1px solid red;
+  padding: 0 8px;
+  font-size: 16px;
+  cursor: pointer;
 `;
 
 export const LanguageSwitcher = () => {
-  const {
-    locale,
-    setLocale
-  } = useLocaleStore();
+  const locale = useLocaleStore(store => store.locale);
+  const setLocale = useLocaleStore(store => store.setLocale);
 
   return (
     <Wrapper onClick={() => setLocale(locale === Locale.EN ? Locale.AR : Locale.EN)}>
-      <T z="Change language"/>
+      <TranslationOutlined/>
     </Wrapper>
   );
 };

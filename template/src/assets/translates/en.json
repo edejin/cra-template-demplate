@@ -1,5 +1,9 @@
 {
-  "test": "test",
+  "Home": "Home",
+  "List": "List",
+  "App": "App",
+  "subnav {value}": "subnav {value}",
+  "option {value}": "option {value}",
   "text <span>{value}</span>.": [{
     "type": 0,
     "value": "text "

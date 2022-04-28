@@ -1,16 +1,13 @@
 import React from 'react';
-import {TranslateProvider} from '@/components/TranslateProvider';
+import {Providers} from '@/components/Providers';
 import 'antd/dist/antd.dark.min.css';
-import {T} from '@/components/Translate';
-import {LanguageSwitcher} from '@/components/LanguageSwitcher';
-import {A} from '@/components/A';
-import {B} from '@/components/B';
+import {LayoutWrapper} from '@/components/LayoutWrapper';
+import {Router} from '@/Router';
 
 export const App = () => (
-  <TranslateProvider>
-    <h1><T z="test"/></h1>
-    <A/>
-    <B/>
-    <LanguageSwitcher/>
-  </TranslateProvider>
+  <Providers>
+    <LayoutWrapper>
+      <Router/>
+    </LayoutWrapper>
+  </Providers>
 );
