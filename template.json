@@ -1,7 +1,6 @@
 {
   "package": {
     "dependencies": {
-      "cra-template-demplate": "latest",
       "@testing-library/jest-dom": "^5.14.1",
       "@testing-library/react": "^13.0.0",
       "@testing-library/user-event": "^13.2.1",
@@ -20,6 +19,7 @@
       "@types/styled-components": "^5.1.25"
     },
     "devDependencies": {
+      "demplate-addons": "latest",
       "path-browserify": "^1.0.1",
       "react-app-rewired": "^2.2.1",
       "customize-cra": "^1.0.0",
