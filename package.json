@@ -36,5 +36,8 @@
     "release:fix": "node ./release.js fix",
     "release:minor": "node ./release.js minor",
     "release:major": "node ./release.js major"
+  },
+  "bin": {
+    "demplate-addons": "./scripts/addons.js"
   }
 }
