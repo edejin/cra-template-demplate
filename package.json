@@ -11,6 +11,10 @@
     "styled-components",
     "rtl-support"
   ],
+  "dependencies": {
+    "inquirer": "^8.2.4",
+    "fs-extra": "^10.1.0"
+  },
   "author": {
     "email": "efim@dezh.in",
     "name": "Efim Dezhin"
