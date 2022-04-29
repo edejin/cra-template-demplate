@@ -29,6 +29,8 @@
     "node": ">=14"
   },
   "files": [
+    "addons",
+    "scripts",
     "template",
     "template.json"
   ],
