@@ -30,7 +30,8 @@ module.exports = function override(config, env) {
       'babel-plugin-styled-components',
       {
         displayName: true,
-        fileName: true
+        fileName: true,
+        minify: false
       },
     ])(config);
   }
