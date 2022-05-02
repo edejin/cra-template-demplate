@@ -6,6 +6,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+### `npm run addons`
+
+Add to project additional libraries with examples.
+
+Available libraries:
+* Cesium
+* MapLibre
+* OpenLayers
+* MobX
+
 ### `npm start`
 
 Runs the app in the development mode.\
