@@ -1,5 +1,4 @@
-import create from 'zustand';
-import {persist} from 'zustand/middleware';
+import {applyMiddleWares, logMiddleware, persistMiddlewareCreator, StoreInterface} from '@/utils/zustand';
 
 export enum Locale {
   EN = 'en',
@@ -15,9 +14,14 @@ interface Store {
   setLocale: (locale: Locale) => void;
 }
 
-export const useLocaleStore = create(persist<Store>((set) => ({
+const store: StoreInterface<Store> = (set) => ({
   locale: defaultLocale,
   setLocale: (locale: Locale) => set(() => ({locale}))
-}), {
-  name: 'locale'
-}));
+});
+
+export const useLocaleStore = applyMiddleWares<Store>(store, [
+  persistMiddlewareCreator({
+    name: 'locale'
+  }),
+  logMiddleware
+]);
