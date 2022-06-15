@@ -1,5 +1,4 @@
 import create, {GetState, SetState, StateCreator, StoreApi} from 'zustand';
-import {persist, PersistOptions} from 'zustand/middleware';
 import {log} from '@/utils/index';
 
 export type StoreInterface<T extends {}> = (
@@ -13,7 +12,7 @@ export type Middleware<T extends {}> = (
   config: StateCreator<T>,
 ) => StoreInterface<T>;
 
-export const applyMiddleWares = <T extends {}>(s: StoreInterface<T>, middlewares: Middleware<T>[]) => create<T>(
+export const applyMiddleware = <T extends {}>(s: StoreInterface<T>, middlewares: Middleware<T>[]) => create<T>(
   middlewares.reduce((a, m) => m(a), s)
 );
 
@@ -27,5 +26,3 @@ export const logMiddleware = <T extends {}>(config: StateCreator<T>) => (
   set(args);
   log('  new state', get());
 }, get, store, $$storeMutations);
-
-export const persistMiddlewareCreator = <T extends {}>(options: PersistOptions<T>) => (s: StoreInterface<T>) => persist<T>(s, options);

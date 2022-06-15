@@ -1,4 +1,5 @@
-import {applyMiddleWares, logMiddleware, persistMiddlewareCreator, StoreInterface} from '@/utils/zustand';
+import {applyMiddleware, logMiddleware, StoreInterface} from '@/utils/zustand';
+import {syncMiddlewareCreator} from '@/utils/syncMiddleware';
 
 export enum Locale {
   EN = 'en',
@@ -19,9 +20,10 @@ const store: StoreInterface<Store> = (set) => ({
   setLocale: (locale: Locale) => set(() => ({locale}))
 });
 
-export const useLocaleStore = applyMiddleWares<Store>(store, [
-  persistMiddlewareCreator({
-    name: 'locale'
+export const useLocaleStore = applyMiddleware<Store>(store, [
+  syncMiddlewareCreator({
+    name: 'locale',
+    syncDynamically: true
   }),
   logMiddleware
 ]);

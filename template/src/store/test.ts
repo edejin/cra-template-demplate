@@ -1,4 +1,4 @@
-import {applyMiddleWares, logMiddleware, StoreInterface} from '@/utils/zustand';
+import {applyMiddleware, logMiddleware, StoreInterface} from '@/utils/zustand';
 import {sleep} from '@/utils';
 import {testMiddleware} from '@/middleware/test';
 
@@ -27,7 +27,7 @@ const store: StoreInterface<Test> = (set, get) => ({
   }
 });
 
-export const useTestStore = applyMiddleWares<Test>(store, [
+export const useTestStore = applyMiddleware<Test>(store, [
   logMiddleware,
   testMiddleware
 ]);
