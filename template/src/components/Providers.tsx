@@ -13,6 +13,8 @@ import enGB from 'antd/lib/locale/en_GB';
 import arWords from '@/assets/translates/ar.json';
 import arEG from 'antd/lib/locale/ar_EG';
 import {HashRouter} from 'react-router-dom';
+import { OnErrorFn } from '@formatjs/intl/src/types';
+import { IntlErrorCode } from '@formatjs/intl/src/error';
 
 const vocabulary: Record<Locale, any> = {
   [Locale.EN]: enWords,
@@ -26,15 +28,19 @@ const antVocabulary = {
 
 const direction = (locale: Locale) => RTLLocales.includes(locale) ? 'rtl' : 'ltr';
 
-export const Providers: React.FC = ({ children }: React.PropsWithChildren<{}>) => {
+interface Props {
+
+}
+
+export const Providers: React.FC<Props> = ({ children }: React.PropsWithChildren<Props>) => {
   const {
     locale
   } = useLocaleStore();
 
-  const errorHandler = useCallback((data) => {
-    const { code, descriptor: { id } } = data;
-    if (code === 'MISSING_TRANSLATION') {
-      log(`Cannot find translate "${id}" in "${locale}"`);
+  const errorHandler = useCallback<OnErrorFn>((data) => {
+    const { code } = data;
+    if (code === IntlErrorCode.MISSING_TRANSLATION) {
+      log(`Cannot find translate "${data.descriptor?.id}" in "${locale}"`);
     } else {
       log(data);
     }

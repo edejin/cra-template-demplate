@@ -24,7 +24,11 @@ const Logo = styled.div`
   background: rgba(255, 255, 255, 0.3);
 `;
 
-export const LayoutWrapper: React.FC = ({children}: PropsWithChildren<{}>) => {
+interface Props {
+
+}
+
+export const LayoutWrapper: React.FC<Props> = ({children}: PropsWithChildren<Props>) => {
   const {
     formatMessage
   } = useIntl();
