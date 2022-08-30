@@ -151,7 +151,7 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
     syncOnStart: true,
     syncDynamically: false,
     merge: (syncedState: unknown, currentState: S) => ({
-      ...currentState,
+      ...(currentState as object),
       ...(syncedState as object),
     }),
     ...baseOptions,
@@ -184,7 +184,7 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
   const thenableSerialize = toThenable(options.serialize);
 
   const setItem = (): Thenable<void> => {
-    const state = options.partialize({...get()});
+    const state = options.partialize(({...(get() as object)}) as S);
 
     const postUpdateCallback =
       options.onUpdateStorage?.(get()) || undefined;
@@ -273,9 +273,9 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
           stateFromStorage = options.merge(
             migratedState as S,
             get() ?? configResult
-          );
+          ) as S;
 
-          set(stateFromStorage as S, true);
+          set(stateFromStorage, true);
           // return setItem();
         })
         .then(() => {
@@ -330,10 +330,10 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
         key
       } = e;
       if (key === options.syncKeyName) {
-        hydrate()
+        hydrate();
       }
     };
-    window.addEventListener("storage", nowICanSeeLocalStorageChangeEvents, false);
+    window.addEventListener('storage', nowICanSeeLocalStorageChangeEvents, false);
   }
 
   return stateFromStorage || configResult;
