@@ -3,10 +3,9 @@
  * Warning in list of middleware, this middleware should be first!
  */
 
-import {StoreInterface} from '@/utils/zustand';
-import {State, StateCreator, StoreApi, StoreMutatorIdentifier} from 'zustand';
+import type {StateCreator, StoreApi, StoreMutatorIdentifier} from 'zustand'
 
-export type StateStorage = {
+export interface StateStorage {
   getItem: (name: string) => string | null | Promise<string | null>
   setItem: (name: string, value: string) => void | Promise<void>
   removeItem: (name: string) => void | Promise<void>
@@ -14,7 +13,7 @@ export type StateStorage = {
 
 type StorageValue<S> = { state: S; version?: number }
 
-export type SyncOptions<S, SyncedState = S> = {
+export interface PersistOptions<S, PersistedState = S> {
   /** Name of the storage (must be unique) */
   name: string
   /** Default `true` */
@@ -40,20 +39,20 @@ export type SyncOptions<S, SyncedState = S> = {
   serialize?: (state: StorageValue<S>) => string | Promise<string>
   /**
    * Use a custom deserializer.
-   * Must return an object matching StorageValue<State>
+   * Must return an object matching StorageValue<S>
    *
    * @param str The storage's current value.
    * @default JSON.parse
    */
   deserialize?: (
     str: string
-  ) => StorageValue<SyncedState> | Promise<StorageValue<SyncedState>>
+  ) => StorageValue<PersistedState> | Promise<StorageValue<PersistedState>>
   /**
-   * Filter the synced value.
+   * Filter the persisted value.
    *
    * @params state The state's value
    */
-  partialize?: (state: S) => SyncedState
+  partialize?: (state: S) => PersistedState
   /**
    * A function returning another (optional) function.
    * The main function will be called before the state rehydration.
@@ -76,27 +75,28 @@ export type SyncOptions<S, SyncedState = S> = {
    */
   version?: number
   /**
-   * A function to perform synced state migration.
-   * This function will be called when synced state versions mismatch with the one specified here.
+   * A function to perform persisted state migration.
+   * This function will be called when persisted state versions mismatch with the one specified here.
    */
-  migrate?: (syncedState: unknown, version: number) => S | Promise<S>
+  migrate?: (persistedState: unknown, version: number) => S | Promise<S>
   /**
    * A function to perform custom hydration merges when combining the stored state with the current one.
    * By default, this function does a shallow merge.
    */
-  merge?: (syncedState: unknown, currentState: S) => S
+  merge?: (persistedState: unknown, currentState: S) => S
 }
 
-type SyncListener<S> = (state: S) => void
+type PersistListener<S> = (state: S) => void
 
-type StoreSync<S extends State, Ps> = {
-  sync: {
-    setOptions: (options: Partial<SyncOptions<S, Ps>>) => void
+type StorePersist<S, Ps> = {
+  persist: {
+    setOptions: (options: Partial<PersistOptions<S, Ps>>) => void
     clearStorage: () => void
     rehydrate: () => Promise<void>
     hasHydrated: () => boolean
-    onHydrate: (fn: SyncListener<S>) => () => void
-    onFinishHydration: (fn: SyncListener<S>) => () => void
+    onHydrate: (fn: PersistListener<S>) => () => void
+    onFinishHydration: (fn: PersistListener<S>) => () => void
+    getOptions: () => Partial<PersistOptions<S, Ps>>
   }
 }
 
@@ -139,7 +139,7 @@ const toThenable =
       }
     };
 
-const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
+const persistImpl: PersistImpl = (config, baseOptions) => (set, get, api) => {
   type S = ReturnType<typeof config>
   let options = {
     getStorage: () => localStorage,
@@ -150,20 +150,20 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
     syncKeyName: `${baseOptions.name}-sync-key`,
     syncOnStart: true,
     syncDynamically: false,
-    merge: (syncedState: unknown, currentState: S) => ({
-      ...(currentState as object),
-      ...(syncedState as object),
+    merge: (persistedState: unknown, currentState: S) => ({
+      ...currentState,
+      ...(persistedState as object),
     }),
     ...baseOptions,
   };
 
-  let hasHydrated = false;
-  const hydrationListeners = new Set<SyncListener<S>>();
-  const finishHydrationListeners = new Set<SyncListener<S>>();
-  let storage: StateStorage | undefined;
+  let hasHydrated = false
+  const hydrationListeners = new Set<PersistListener<S>>()
+  const finishHydrationListeners = new Set<PersistListener<S>>()
+  let storage: StateStorage | undefined
 
   try {
-    storage = options.getStorage();
+    storage = options.getStorage()
   } catch (e) {
     // prevent error if the storage is not defined (e.g. when server side rendering a page)
   }
@@ -172,19 +172,19 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
     return config(
       (...args) => {
         console.warn(
-          `[zustand sync middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
-        );
-        set(...args);
+          `[zustand persist middleware] Unable to update item '${options.name}', the given storage is currently unavailable.`
+        )
+        set(...args)
       },
       get,
       api
     );
   }
 
-  const thenableSerialize = toThenable(options.serialize);
+  const thenableSerialize = toThenable(options.serialize)
 
   const setItem = (): Thenable<void> => {
-    const state = options.partialize(({...(get() as object)}) as S);
+    const state = options.partialize({ ...get() });
 
     const postUpdateCallback =
       options.onUpdateStorage?.(get()) || undefined;
@@ -273,10 +273,10 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
           stateFromStorage = options.merge(
             migratedState as S,
             get() ?? configResult
-          ) as S;
+          );
 
-          set(stateFromStorage, true);
-          // return setItem();
+          set(stateFromStorage as S, true);
+          // return setItem()
         })
         .then(() => {
           postRehydrationCallback?.(stateFromStorage, undefined);
@@ -288,7 +288,7 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
         });
     }
 
-  ;(api as StoreApi<S> & StoreSync<S, S>).sync = {
+  ;(api as StoreApi<S> & StorePersist<S, S>).persist = {
     setOptions: (newOptions) => {
       options = {
         ...options,
@@ -302,6 +302,7 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
     clearStorage: () => {
       storage?.removeItem(options.name);
     },
+    getOptions: () => options,
     rehydrate: () => hydrate() as Promise<void>,
     hasHydrated: () => hasHydrated,
     onHydrate: (cb) => {
@@ -339,38 +340,33 @@ const syncImpl: SyncImpl = (config, baseOptions) => (set, get, api) => {
   return stateFromStorage || configResult;
 };
 
-type Sync = <T extends State,
+type Persist = <
+  T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-  U = Partial<T>>(
-  initializer: StateCreator<T, [...Mps, ['sync', unknown]], Mcs>,
-  options?: SyncOptions<T, U>
-) => StateCreator<T, Mps, [['sync', U], ...Mcs]>
+  U = T
+  >(
+  initializer: StateCreator<T, [...Mps, ['persist2', unknown]], Mcs>,
+  options?: PersistOptions<T, U>
+) => StateCreator<T, Mps, [['persist2', U], ...Mcs]>
 
 declare module 'zustand/vanilla' {
   interface StoreMutators<S, A> {
-    'sync': WithSync<S, A>
+    'persist2': WithPersist<S, A>
   }
 }
 
-type Write<T extends object, U extends object> = Omit<T, keyof U> & U
-type Cast<T, U> = T extends U ? T : U
+type Write<T, U> = Omit<T, keyof U> & U
 
-type WithSync<S, A> = S extends { getState: () => infer T }
-  ? Write<S, StoreSync<Cast<T, State>, A>>
+type WithPersist<S, A> = S extends { getState: () => infer T }
+  ? Write<S, StorePersist<T, A>>
   : never
 
-type SyncImpl = <T extends State>(
-  storeInitializer: PopArgument<StateCreator<T, [], []>>,
-  options: SyncOptions<T, T>
-) => PopArgument<StateCreator<T, [], []>>
+type PersistImpl = <T>(
+  storeInitializer: StateCreator<T, [], []>,
+  options: PersistOptions<T, T>
+) => StateCreator<T, [], []>
 
-type PopArgument<T extends (...a: never[]) => unknown> = T extends (
-  ...a: [...infer A, infer _]
-  ) => infer R
-  ? (...a: A) => R
-  : never
+export const persist = persistImpl as unknown as Persist
 
-export const syncMiddleware = syncImpl as unknown as Sync;
-
-export const syncMiddlewareCreator = <T extends {}>(options: SyncOptions<T>) => (s: StoreInterface<T>) => syncMiddleware<T>(s, options);
+export const persistMiddlewareCreator = <T extends {}>(options: PersistOptions<T>) => (s: StateCreator<T>) => persist<T>(s, options);

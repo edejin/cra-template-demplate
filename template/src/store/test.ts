@@ -1,6 +1,7 @@
-import {applyMiddleware, logMiddleware, StoreInterface} from '@/utils/zustand';
+import {applyMiddleware, logMiddleware} from '@/utils/zustand';
 import {sleep} from '@/utils';
 import {testMiddleware} from '@/middleware/test';
+import {StateCreator} from 'zustand';
 
 export interface Test {
   a: number;
@@ -12,7 +13,7 @@ export interface Test {
   clearB: () => void;
 }
 
-const store: StoreInterface<Test> = (set, get) => ({
+const store: StateCreator<Test> = (set, get) => ({
   a: 0,
   b: 0,
   addA: () => set(state => ({a: state.a + 1})),
