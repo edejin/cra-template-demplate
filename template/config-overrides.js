@@ -1,5 +1,6 @@
 const path = require('path');
 const {addBabelPlugin} = require('customize-cra');
+const WebpackObfuscator = require('webpack-obfuscator');
 
 module.exports = function override(config, env) {
   let isDev = env === 'development';
@@ -34,6 +35,13 @@ module.exports = function override(config, env) {
         minify: false
       },
     ])(config);
+  } else {
+    config.plugins.push(
+      new WebpackObfuscator ({
+      }, [
+        // 'excluded_bundle_name.js'
+      ])
+    )
   }
 
   return config;
