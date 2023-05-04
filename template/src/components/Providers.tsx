@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
-import { IntlProvider } from 'react-intl';
+import { IntlProvider, MissingTranslationError } from 'react-intl';
 import { log } from '@/utils';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import { StyleSheetManager } from 'styled-components';
 import rtlcss from 'stylis-rtlcss';
 import { Locale, RTLLocales, useLocaleStore } from '@/store/locale';
@@ -15,6 +15,8 @@ import arEG from 'antd/lib/locale/ar_EG';
 import {HashRouter} from 'react-router-dom';
 import { OnErrorFn } from '@formatjs/intl/src/types';
 import { IntlErrorCode } from '@formatjs/intl/src/error';
+import {Theme, useThemeStore} from '@/store/theme';
+import {StyleProvider} from '@ant-design/cssinjs';
 
 const vocabulary: Record<Locale, any> = {
   [Locale.EN]: enWords,
@@ -36,11 +38,12 @@ export const Providers: React.FC<Props> = ({ children }: React.PropsWithChildren
   const {
     locale
   } = useLocaleStore();
+  const currentTheme = useThemeStore(v => v.theme);
 
   const errorHandler = useCallback<OnErrorFn>((data) => {
     const { code } = data;
     if (code === IntlErrorCode.MISSING_TRANSLATION) {
-      log(`Cannot find translate "${data.descriptor?.id}" in "${locale}"`);
+      log(`Cannot find translate "${(data as MissingTranslationError).descriptor?.id}" in "${locale}"`);
     } else {
       log(data);
     }
@@ -54,13 +57,21 @@ export const Providers: React.FC<Props> = ({ children }: React.PropsWithChildren
     <StyleSheetManager {...(direction(locale) === 'rtl' ? { stylisPlugins: [rtlcss] } : {})}>
       <>
         <GlobalStyle />
-        <ConfigProvider locale={antVocabulary[locale]} direction={direction(locale)}>
-          <IntlProvider locale={locale} messages={vocabulary[locale]} onError={errorHandler}>
-            <HashRouter>
-              {children}
-            </HashRouter>
-          </IntlProvider>
-        </ConfigProvider>
+        <StyleProvider hashPriority={'high'}>
+          <ConfigProvider
+            locale={antVocabulary[locale]}
+            direction={direction(locale)}
+            theme={{
+              algorithm: currentTheme === Theme.Dark ? theme.darkAlgorithm : theme.defaultAlgorithm
+            }}
+          >
+            <IntlProvider locale={locale} messages={vocabulary[locale]} onError={errorHandler}>
+              <HashRouter>
+                {children}
+              </HashRouter>
+            </IntlProvider>
+          </ConfigProvider>
+        </StyleProvider>
       </>
     </StyleSheetManager>
   );

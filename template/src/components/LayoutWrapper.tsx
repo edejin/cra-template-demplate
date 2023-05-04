@@ -6,6 +6,7 @@ import {LaptopOutlined, NotificationOutlined, UserOutlined} from '@ant-design/ic
 import styled from 'styled-components';
 import {useIntl} from 'react-intl';
 import {Link} from 'react-router-dom';
+import {ThemeSwitcher} from '@/components/ThemeSwitcher';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -58,14 +59,24 @@ export const LayoutWrapper: React.FC<Props> = ({children}: PropsWithChildren<Pro
       <Header>
         <Logo/>
         <LanguageSwitcher/>
-        <Menu mode="horizontal" defaultSelectedKeys={['1']} items={items1} />
+        <ThemeSwitcher/>
+        <Menu mode="horizontal" defaultSelectedKeys={['1']} items={items1} theme='dark' />
       </Header>
       <Content style={{ padding: '0 50px' }}>
-        <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item><T z="Home"/></Breadcrumb.Item>
-          <Breadcrumb.Item><T z="List"/></Breadcrumb.Item>
-          <Breadcrumb.Item><T z="App"/></Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          style={{margin: '16px 0'}}
+          items={[
+            {
+              title: <T z="Home"/>
+            },
+            {
+              title: <T z="List"/>
+            },
+            {
+              title: <T z="App"/>
+            }
+          ]}
+        />
         <Layout className="site-layout-background" style={{ padding: '24px 0' }}>
           <Sider className="site-layout-background" width={200}>
             <Menu

@@ -2,7 +2,7 @@ import React from 'react';
 import {T} from '@/components/Translate';
 import {useTestStore} from '@/store/test';
 import {Button} from 'antd';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 
 export const B = () => {
   const [b, addB, clearB] = useTestStore((store) => {

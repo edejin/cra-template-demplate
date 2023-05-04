@@ -1,4 +1,4 @@
-import create, {GetState, SetState, StateCreator, StoreApi} from 'zustand';
+import {create, StateCreator} from 'zustand';
 import {log} from '@/utils/index';
 
 export type Middleware<T extends {}> = (
@@ -9,10 +9,10 @@ export const applyMiddleware = <T extends {}>(s: StateCreator<T>, middlewares: M
   middlewares.reduce((a, m) => m(a), s)
 );
 
-export const logMiddleware = <T extends {}>(config: StateCreator<T>) => (
-  set: SetState<T>,
-  get: GetState<T>,
-  store: StoreApi<T>
+export const logMiddleware: Middleware<any> = (config) => (
+  set,
+  get,
+  store
 ) => config(args => {
   log('  applying', args);
   set(args);

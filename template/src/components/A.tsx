@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {T} from '@/components/Translate';
 import {useTestStore} from '@/store/test';
 import {Button} from 'antd';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import {log} from '@/utils';
 import {FieldTimeOutlined} from '@ant-design/icons';
 

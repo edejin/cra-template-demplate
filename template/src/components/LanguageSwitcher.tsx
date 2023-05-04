@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   padding: 0 8px;
   font-size: 16px;
   cursor: pointer;
+  color: #ffffff;
 `;
 
 export const LanguageSwitcher = () => {

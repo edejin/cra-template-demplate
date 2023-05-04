@@ -1,6 +1,6 @@
 import React from 'react';
 import {Providers} from '@/components/Providers';
-import 'antd/dist/antd.dark.min.css';
+import 'antd/dist/reset.css';
 import {LayoutWrapper} from '@/components/LayoutWrapper';
 import {Router} from '@/Router';
 
